@@ -37,7 +37,7 @@ const SlideCard = ({ slide, setSelectSlides, selectSlides, mainSection, subSecti
         <div className="aspect-[16/9] w-full">
           <img src={slide.presignedUrl} alt={slide.fileId} className="w-full h-full object-cover" />
         </div>
-        <div className="flex items-center gap-2 mx-1 ml-2">
+        <div className="flex items-center gap-2 p-2">
           <input
             type="checkbox"
             checked={isChecked}
@@ -48,8 +48,10 @@ const SlideCard = ({ slide, setSelectSlides, selectSlides, mainSection, subSecti
             className="w-4 h-4 rounded border-2 border-[#E6E6EA] 
               checked:bg-[#00BEC0] checked:border-[#00BEC0] 
               transition-colors duration-200 cursor-pointer"
-          />
-          <span className="text-sm text-[#666666]">{slide.type}</span>
+          ></input>
+          <label htmlFor="myInput" className="text-sm text-[#666666]">
+            {slide.slideId}
+          </label>
         </div>
       </div>
     </div>

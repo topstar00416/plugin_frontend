@@ -16,9 +16,10 @@ const CreateSlides = () => {
   const [subSection, setSubSection] = useState(null);
 
   const [selectSlides, setSelectSlides] = useState([]);
+  const [insertData, setInsertData] = useState([]);
 
   const tabs = [
-    { id: "found", label: "Found styles" },
+    { id: "found", label: "Found slides" },
     { id: "selected", label: "Selected slides" },
   ];
 
@@ -29,10 +30,6 @@ const CreateSlides = () => {
       loadingElement.style.display = "none";
     }
   }, []);
-
-  useEffect(() => {
-    console.log("my_log", selectSlides);
-  }, [selectSlides]);
 
   const createDeck = (payload) => {
     api
@@ -46,7 +43,23 @@ const CreateSlides = () => {
         setStep("second");
       })
       .catch((err) => {
-        console.log("Create Deck Error: ", err.response.data);
+        console.log("Create Deck Error: ", err);
+      });
+  };
+
+  const insertToDeck = (payload) => {
+    console.log("Insert To Deck Payload: ", payload);
+    api
+      .post("/decks/slides_from_file_name/", payload)
+      .then((res) => {
+        const temp = res.data.splice(0, selectSlides.length);
+        console.log("Insert To Deck Response: ", temp);
+        setDeck(temp);
+
+        // setInsertData(res.data.splice(0, selectSlides.length));
+      })
+      .catch((err) => {
+        console.log("Insert To Deck Error: ", err);
       });
   };
 
@@ -131,26 +144,19 @@ const CreateSlides = () => {
                 <div className="flex flex-col overflow-y-auto grid grid-cols-3 gap-2 pb-4 hide-scrollbar mt-[20px]">
                   {selectSlides?.map((slide, index) => (
                     <div key={slide.slideId}>
-                      <div className="group flex flex-col justify-center items-center transform transition-transform duration-100 active:scale-95">
-                        <div
-                          className="rounded-lg overflow-hidden bg-white border border-[#E6E6EA] 
-                            transition-all duration-200 hover:border-[#00BEC0] hover:shadow-md"
-                        >
-                          <div className="aspect-[16/9] w-full">
-                            <img src={slide.presignedUrl} alt={slide.fileId} className="w-full h-full object-cover" />
-                          </div>
-                          <div className="flex items-center gap-2 mx-1 ml-2">
-                            <span className="text-sm text-[#666666]">{slide.type}</span>
-                          </div>
-                        </div>
-                      </div>
+                      <SlideCard
+                        slide={slide}
+                        setSelectSlides={setSelectSlides}
+                        selectSlides={selectSlides}
+                        mainSection={slide.mainSection}
+                        subSection={slide.subSection}
+                      />
                     </div>
                   ))}
                   {selectSlides.length === 0 && <h1>No slides selected</h1>}
                 </div>
               )}
             </div>
-
             {/* Bottom Buttons */}
             {step === "second" && (
               <div className="sticky bottom-0 w-full border-t border-[#e6e6ea] bg-white p-4 flex justify-end">
@@ -160,7 +166,15 @@ const CreateSlides = () => {
                   </button>
                   <button
                     className="px-4 py-2 rounded-md bg-[#00BEC0] text-white hover:bg-[#00a5a7] transition-colors"
-                    onClick={() => setDeck(selectSlides)}
+                    onClick={() => {
+                      insertToDeck({
+                        file_name: "mckinsey.pptx",
+                        slides: selectSlides.map((item) => ({
+                          slide_id: item.slideId,
+                          file_id: item.fileId,
+                        })),
+                      });
+                    }}
                   >
                     Insert to deck
                   </button>
