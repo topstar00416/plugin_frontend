@@ -53,61 +53,73 @@ const CreateSlides = () => {
         const presentation = context.presentation;
 
         for (const slideData of deck) {
-          // Add a new slide
-          const newSlide = presentation.slides.add();
+          // Add a new slide and get its reference
+          const slideMaster = presentation.slideMasters.getItemAt(0);
+          const layout = slideMaster.layouts.getItemAt(0); // Get the first layout
+          const newSlide = presentation.slides.addSlide(0, layout); // Specify layout
+
+          // Load and sync before adding content
+          newSlide.load("id");
+          await context.sync();
 
           // Add texts
           slideData.texts.forEach((text, index) => {
             if (text) {
-              // Only add non-empty text
-              const textBox = newSlide.shapes.addTextBox(text);
+              try {
+                const textBox = newSlide.shapes.addTextBox(text);
+                // Position text boxes at different locations based on index
+                switch (index) {
+                  case 0: // First text
+                    textBox.left = 50;
+                    textBox.top = 50;
+                    break;
+                  case 1: // Second text
+                    textBox.left = 50;
+                    textBox.top = 100;
+                    break;
+                  case 2: // Third text
+                    textBox.left = 50;
+                    textBox.top = 150;
+                    break;
+                  case 3: // Fourth text
+                    textBox.left = 50;
+                    textBox.top = 200;
+                    break;
+                  default:
+                    textBox.left = 50;
+                    textBox.top = 50 + index * 50;
+                }
 
-              // Position text boxes at different locations based on index
-              switch (index) {
-                case 0: // First text
-                  textBox.left = 50;
-                  textBox.top = 50;
-                  break;
-                case 1: // Second text
-                  textBox.left = 50;
-                  textBox.top = 100;
-                  break;
-                case 2: // Third text
-                  textBox.left = 50;
-                  textBox.top = 150;
-                  break;
-                case 3: // Fourth text
-                  textBox.left = 50;
-                  textBox.top = 200;
-                  break;
-                default:
-                  textBox.left = 50;
-                  textBox.top = 50 + index * 50;
+                // Style the text
+                textBox.width = 400;
+                textBox.height = 40;
+                const textRange = textBox.textFrame.textRange;
+                textRange.font.size = 18;
+                textRange.font.color = "#000000";
+              } catch (e) {
+                console.error(`Error adding text ${index}:`, e);
               }
-
-              // Style the text
-              textBox.width = 400;
-              textBox.height = 40;
-              const textRange = textBox.textFrame.textRange;
-              textRange.font.size = 18;
-              textRange.font.color = "#000000";
             }
           });
 
           // Add images if any
           slideData.images.forEach((imageBase64, index) => {
             if (imageBase64) {
-              const image = newSlide.shapes.addImage(`data:image/png;base64,${imageBase64}`);
-              // Position image after text
-              image.left = 50;
-              image.top = 250;
-              image.width = 400;
-              image.height = 300;
+              try {
+                const image = newSlide.shapes.addImage(`data:image/png;base64,${imageBase64}`);
+                // Position image after text
+                image.left = 50;
+                image.top = 250;
+                image.width = 400;
+                image.height = 300;
+              } catch (e) {
+                console.error(`Error adding image ${index}:`, e);
+              }
             }
           });
-        }
 
-        await context.sync();
+          await context.sync(); // Sync after each slide
+        }
       });
 
       console.log("Slides created successfully!");
