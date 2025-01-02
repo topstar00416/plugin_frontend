@@ -47,16 +47,82 @@ const CreateSlides = () => {
       });
   };
 
+  const createPowerPointSlides = async (deck) => {
+    try {
+      await PowerPoint.run(async (context) => {
+        const presentation = context.presentation;
+
+        for (const slideData of deck) {
+          // Add a new slide
+          const newSlide = presentation.slides.add();
+
+          // Add texts
+          slideData.texts.forEach((text, index) => {
+            if (text) {
+              // Only add non-empty text
+              const textBox = newSlide.shapes.addTextBox(text);
+
+              // Position text boxes at different locations based on index
+              switch (index) {
+                case 0: // First text
+                  textBox.left = 50;
+                  textBox.top = 50;
+                  break;
+                case 1: // Second text
+                  textBox.left = 50;
+                  textBox.top = 100;
+                  break;
+                case 2: // Third text
+                  textBox.left = 50;
+                  textBox.top = 150;
+                  break;
+                case 3: // Fourth text
+                  textBox.left = 50;
+                  textBox.top = 200;
+                  break;
+                default:
+                  textBox.left = 50;
+                  textBox.top = 50 + index * 50;
+              }
+
+              // Style the text
+              textBox.width = 400;
+              textBox.height = 40;
+              const textRange = textBox.textFrame.textRange;
+              textRange.font.size = 18;
+              textRange.font.color = "#000000";
+            }
+          });
+
+          // Add images if any
+          slideData.images.forEach((imageBase64, index) => {
+            if (imageBase64) {
+              const image = newSlide.shapes.addImage(`data:image/png;base64,${imageBase64}`);
+              // Position image after text
+              image.left = 50;
+              image.top = 250;
+              image.width = 400;
+              image.height = 300;
+            }
+          });
+        }
+
+        await context.sync();
+      });
+
+      console.log("Slides created successfully!");
+    } catch (error) {
+      console.error("Error creating slides:", error);
+    }
+  };
+
   const insertToDeck = (payload) => {
-    console.log("Insert To Deck Payload: ", payload);
     api
       .post("/decks/slides_from_file_name/", payload)
       .then((res) => {
-        const temp = res.data.splice(0, selectSlides.length);
-        console.log("Insert To Deck Response: ", temp);
-        setDeck(temp);
-
-        // setInsertData(res.data.splice(0, selectSlides.length));
+        console.log("Insert To Deck Response: ", res.data);
+        // setDeck(res.data);
+        createPowerPointSlides(res.data);
       })
       .catch((err) => {
         console.log("Insert To Deck Error: ", err);
