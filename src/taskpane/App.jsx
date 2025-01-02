@@ -56,11 +56,11 @@ export default function App() {
   const renderSearchBar = () => (
     <div className="mb-4">
       <button
-        className="w-full p-4 rounded-lg bg-[#00BEC0] text-white flex items-center gap-2 
+        className="w-full p-4 rounded-lg bg-[#00BEC0] text-white flex items-center gap-2 justify-center
           transition-all hover:shadow-md active:scale-[0.98]"
         onClick={() => showDialog("search")}
       >
-        <span className="opacity-80 text-lg">🔍</span>
+        {/* <span className="opacity-80 text-lg">🔍</span> */}
         Search Slides
       </button>
     </div>

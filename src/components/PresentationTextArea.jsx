@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 
 const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
+  const [userQuery, setUserQuery] = useState("");
   return (
     <div className="relative flex-1">
       <div className="text-sm font-bold text-[#666666] mb-2">Describe the presentation you would like</div>
@@ -14,9 +15,11 @@ const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
                   ? "w-full h-[200px] px-4 pr-10 py-2 bg-[#F5F5F5] rounded-lg text-sm outline-none focus:border-[#00BEC0] transition-all duration-200"
                   : "w-full h-[130px] px-4 pr-10 py-2 bg-[#F5F5F5] rounded-lg text-sm outline-none focus:border-[#00BEC0] transition-all duration-200"
               }`}
+          value={userQuery}
+          onChange={(e) => setUserQuery(e.target.value)}
         ></textarea>
         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-center">
-          <span className="text-sm text-gray-500">0/100000 characters</span>
+          <span className="text-sm text-gray-500">{userQuery.length}/100000 characters</span>
           <div className="flex gap-2">
             <button className="p-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -28,7 +31,7 @@ const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
               onClick={() => {
                 if (step === "first") {
                   createDeck({
-                    userQuery: "Need a deck on sustainability trends in technology industry for Q1 2025.",
+                    userQuery,
                     relevantProduct: "GreenTech Analytics",
                   });
                 }
