@@ -3,16 +3,17 @@ import SlideCard from "../components/SlideCard";
 import PresentationTextArea from "../components/PresentationTextArea";
 import SidebarSection from "../components/SidebarSection";
 import Sidebar from "../components/Sidebar";
-
-import mockup from "../../mockup.json";
+import api from "../utils/api";
 
 const CreateSlides = () => {
   const [activeButton, setActiveButton] = useState(window.localStorage.getItem("appState"));
   const [activeTab, setActiveTab] = useState("found");
   const [step, setStep] = useState("first");
-  const [deck, setDeck] = useState(mockup.storylineSlides.sections);
-  const [mainSection, setMainSection] = useState(mockup.storylineSlides.sections[0].sectionName);
-  const [subSection, setSubSection] = useState(mockup.storylineSlides.sections[0].subSections[0].subSectionName);
+
+  const [createdDeck, setCreatedDeck] = useState(null);
+  const [deck, setDeck] = useState(null);
+  const [mainSection, setMainSection] = useState(null);
+  const [subSection, setSubSection] = useState(null);
 
   const [selectSlides, setSelectSlides] = useState([]);
 
@@ -33,6 +34,22 @@ const CreateSlides = () => {
     console.log("my_log", selectSlides);
   }, [selectSlides]);
 
+  const createDeck = (payload) => {
+    api
+      .post("/decks/", payload)
+      .then((res) => {
+        console.log("Create Deck Response: ", res.data);
+        setCreatedDeck(res.data);
+        setDeck(res.data.storylineSlides.sections);
+        setMainSection(res.data.storylineSlides.sections[0].sectionName);
+        setSubSection(res.data.storylineSlides.sections[0].subSections[0].subSectionName);
+        setStep("second");
+      })
+      .catch((err) => {
+        console.log("Create Deck Error: ", err.response.data);
+      });
+  };
+
   return (
     <div className="h-screen w-screen">
       <div className="absolute bg-white overflow-y-auto shadow-lg w-full h-full">
@@ -50,7 +67,7 @@ const CreateSlides = () => {
               {/* Search and Filter */}
               <div className="flex flex-col items-center justify-center">
                 <div className="flex items-center justify-between mb-6 w-[100%]">
-                  <PresentationTextArea step={step} setStep={setStep} />
+                  <PresentationTextArea step={step} setStep={setStep} createDeck={createDeck} />
                 </div>
               </div>
 
@@ -85,30 +102,29 @@ const CreateSlides = () => {
                 }
               `}
                 >
-                  {(mainSection
-                    ? mockup.storylineSlides.sections
-                        .find((item) => item.sectionName === mainSection)
-                        .subSections.find((item) => item.subSectionName === subSection).slides
-                    : mockup.storylineSlides.sections[0].subSections[0].slides
-                  ).map((slide, index) => {
-                    console.log("my_log_slide", slide);
-                    return (
-                      <div
-                        key={slide.slideId}
-                        className={`
+                  {(mainSection && subSection
+                    ? deck
+                        ?.find((item) => item.sectionName === mainSection)
+                        ?.subSections.find((item) => item.subSectionName === subSection).slides || []
+                    : deck
+                      ? deck[0].subSections[0].slides
+                      : []
+                  ).map((slide, index) => (
+                    <div
+                      key={slide.slideId}
+                      className={`
                     ${step === "first" ? "flex-shrink-0 w-[180px]" : ""}
                   `}
-                      >
-                        <SlideCard
-                          slide={slide}
-                          setSelectSlides={setSelectSlides}
-                          selectSlides={selectSlides}
-                          mainSection={mainSection}
-                          subSection={subSection}
-                        />
-                      </div>
-                    );
-                  })}
+                    >
+                      <SlideCard
+                        slide={slide}
+                        setSelectSlides={setSelectSlides}
+                        selectSlides={selectSlides}
+                        mainSection={mainSection}
+                        subSection={subSection}
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
               {activeTab === "selected" && (
@@ -160,7 +176,7 @@ const CreateSlides = () => {
             <div className="flex flex-col gap-4">
               <h3 className="text-base font-medium">Content Structure</h3>
 
-              {deck.map((section, index) => (
+              {deck?.map((section, index) => (
                 <SidebarSection
                   key={index + 1}
                   title={section.sectionName}

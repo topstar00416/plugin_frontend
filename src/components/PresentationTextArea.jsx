@@ -1,6 +1,6 @@
 import React from "react";
 
-const PresentationTextArea = ({ step, setStep }) => {
+const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
   return (
     <div className="relative flex-1">
       <div className="text-sm font-bold text-[#666666] mb-2">Describe the presentation you would like</div>
@@ -27,7 +27,10 @@ const PresentationTextArea = ({ step, setStep }) => {
               className="bg-[#00BEC0] text-white px-4 py-1 rounded-md hover:bg-[#00a5a7] transition-colors"
               onClick={() => {
                 if (step === "first") {
-                  setStep("second");
+                  createDeck({
+                    userQuery: "Need a deck on sustainability trends in technology industry for Q1 2025.",
+                    relevantProduct: "GreenTech Analytics",
+                  });
                 }
               }}
             >
