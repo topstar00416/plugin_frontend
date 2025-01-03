@@ -31,15 +31,20 @@ export default function App() {
           try {
             // console.log("Message received from dialog:", args.message);
 
-            const { type, payload } = JSON.parse(args.message);
-            console.log("base64 payload:", payload);
+            const {
+              type,
+              payload: { base64Only, slideIds },
+            } = JSON.parse(args.message);
+            console.log("payload:", { base64Only, slideIds });
 
             if (type === "insertSlide") {
               console.log("Inserting slide");
               await PowerPoint.run(async (context) => {
                 try {
                   const presentation = context.presentation;
-                  presentation.insertSlidesFromBase64(payload);
+                  presentation.insertSlidesFromBase64(base64Only, {
+                    sourceSlideIds: slideIds,
+                  });
                   await context.sync();
                 } catch (error) {
                   console.error("Error inserting slides:", error);
