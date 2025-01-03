@@ -33,6 +33,7 @@ export default function App() {
 
             const { type, payload } = JSON.parse(args.message);
             console.log("parsedMsg:", type, payload);
+
             if (type === "insertSlide") {
               console.log("Inserting slide");
               await PowerPoint.run(async (context) => {
