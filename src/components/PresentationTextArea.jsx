@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
   const [userQuery, setUserQuery] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   return (
     <div className="relative flex-1">
       <div className="text-sm font-bold text-[#666666] mb-2">Describe the presentation you would like</div>
@@ -21,11 +22,41 @@ const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-center">
           <span className="text-sm text-gray-500">{userQuery.length}/100000 characters</span>
           <div className="flex gap-2">
-            <button className="p-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                className="p-2 transition-all hover:scale-110 active:scale-95" 
+                onClick={() => document.getElementById('fileUpload').click()}
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                  className="transition-transform hover:rotate-12"
+                >
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                </svg>
+                <input 
+                  id="fileUpload"
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    // Handle file upload here
+                    const file = e.target.files[0];
+                    if (file) {
+                      // Process the file
+                      console.log('File uploaded:', file);
+                      setSelectedFile(file.name);
+                    }
+                  }}
+                />
+              </button>
+              {selectedFile && (
+                <span className="text-sm text-gray-600 truncate max-w-[150px] animate-fadeIn">{selectedFile}</span>
+              )}
+            </div>
             <button
               className="bg-[#00BEC0] text-white px-4 py-1 rounded-md hover:bg-[#00a5a7] transition-colors"
               onClick={() => {

@@ -17,6 +17,8 @@ const CreateSlides = () => {
 
   const [selectSlides, setSelectSlides] = useState([]);
   const [insertData, setInsertData] = useState([]);
+  const [selectedCard,setSelectedCard] = useState("");
+  const [deleteSection,setDeleteSection] = useState("");
 
   const tabs = [
     { id: "found", label: "Found slides" },
@@ -30,6 +32,14 @@ const CreateSlides = () => {
       loadingElement.style.display = "none";
     }
   }, []);
+
+  useEffect(() => {
+    if (deleteSection && deck) {
+      const updatedDeck = deck.filter((item) => item.sectionName !== deleteSection);
+      setDeck(updatedDeck);
+      setDeleteSection("");
+    }
+  }, [deleteSection, deck]);
 
   const createDeck = async (payload) => {
     try {
@@ -193,11 +203,15 @@ const CreateSlides = () => {
               {deck?.map((section, index) => (
                 <SidebarSection
                   key={index + 1}
+                  deleteSection={deleteSection}
                   title={section.sectionName}
                   items={section.subSections}
+                  selectedCard={selectedCard}
                   isExpanded={index === 0} // First section expanded by default
+                  setDeleteSection={setDeleteSection}
                   setMainSection={setMainSection}
                   setSubSection={setSubSection}
+                  setSelectedCard={setSelectedCard}
                 />
               ))}
             </div>
