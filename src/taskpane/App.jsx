@@ -8,11 +8,15 @@ export default function App() {
     try {
       const dialogUrl = "https://localhost:3000/textDialog.html";
       const dialogOptions = {
-        width: 75, // 1230:65 - 1212
-        height: 75, // 602:65 - 754
-        displayInIframe: false,
+        width: 75,
+        height: 75,
+        displayInIframe: true,
         title: "Insert",
       };
+
+      // First set the mode so the dialog knows what to display
+      setMode(inputMode);
+      window.localStorage.setItem("appState", inputMode);
 
       Office.context.ui.displayDialogAsync(dialogUrl, dialogOptions, (result) => {
         if (result.status === Office.AsyncResultStatus.Failed) {
@@ -20,19 +24,45 @@ export default function App() {
           return;
         }
 
-        setMode(inputMode);
-
         const dialog = result.value;
+        
+        // Handle messages from dialog
         dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (args) => {
           try {
-            if (args.message && args.message !== "CANCEL") {
-              await taskpane.showModal(args.message);
+            console.log("Message received from dialog:", args.message);
+
+            const parsedMsg = JSON.parse(args.message)
+            console.log(parsedMsg)
+            if (parsedMsg && parsedMsg.type === 'insertSlide') {
+              console.log("Inserting slide");
+              // Handle the slide insertion here in the taskpane
+              await PowerPoint.run(async (context) => {
+                const presentation = context.presentation;
+                
+                // Get the current slides collection
+                const slides = presentation.slides;
+                slides.load("items");
+                await context.sync();
+                
+                // Add new slide at the end
+                const newSlide = slides.add({
+                  position: slides.items.length
+                });
+                
+                await context.sync();
+                console.log("Slide added successfully");
+              });
             }
           } catch (error) {
             console.error("Error handling dialog message:", error);
           } finally {
             dialog.close();
           }
+        });
+
+        // Handle dialog closed event
+        dialog.addEventHandler(Office.EventType.DialogEventReceived, (arg) => {
+          console.log("Dialog event received:", arg);
         });
       });
     } catch (error) {

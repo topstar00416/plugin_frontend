@@ -7,6 +7,15 @@ const showModal = async (text) => {
     try {
       console.log("Starting to create slide with text:", text);
 
+      Office.onReady((info) => {
+        if (info.host === Office.HostType.PowerPoint) {
+          // Initialize your app here
+          console.log("Office.js is ready in PowerPoint");
+        }
+      });
+
+      console.log(Office.context.requirements.isSetSupported("PowerPointApi", "1.1"))
+
       // Ensure we're in PowerPoint context
       if (Office.context.requirements.isSetSupported("PowerPointApi", "1.1")) {
         // First, create a new slide

@@ -28,7 +28,7 @@ const DialogContent = () => {
     case "search":
       return <SearchSlides />;
     default:
-      return null;
+      return <div>Loading...</div>;
   }
 };
 
@@ -65,9 +65,12 @@ function initialize() {
 
 // Ensure Office is initialized before rendering
 if (window.Office) {
-  Office.onReady(() => {
-    console.log("Office.onReady called in dialog");
-    initialize();
+  Office.onReady((info) => {
+    if (info.host === Office.HostType.PowerPoint) {
+      console.log("PowerPoint is ready");
+      console.log("Office.onReady called in dialog");
+      initialize();
+    }
   });
 } else {
   console.error("Office.js is not loaded");

@@ -31,6 +31,61 @@ const CreateSlides = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // Message handler for dialog communication
+    const messageHandler = async (event) => {
+      if (event.data.type === 'insertSlide') {
+        try {
+          // Make sure Office is ready
+          await Office.onReady();
+          
+          await PowerPoint.run(async (context) => {
+            const presentation = context.presentation;
+            
+            // Get the current slides collection
+            const slides = presentation.slides;
+            slides.load("items");
+            await context.sync();
+            
+            // Get the first slide master and layout
+            const masterSlides = presentation.slideMasters;
+            masterSlides.load("items");
+            await context.sync();
+            
+            const firstMaster = masterSlides.items[0];
+            firstMaster.layouts.load("items");
+            await context.sync();
+            
+            // Use the first layout (usually blank)
+            const layout = firstMaster.layouts.items[0];
+            
+            // Add new slide at the end
+            const newSlide = slides.add({
+              position: slides.items.length
+            });
+            
+            await context.sync();
+            console.log("Slide added successfully");
+          });
+        } catch (error) {
+          console.error("Error adding slide:", error);
+          // Log more detailed error information
+          if (error.debugInfo) {
+            console.error("Debug info:", error.debugInfo);
+          }
+        }
+      }
+    };
+
+    // Add message listener
+    window.addEventListener('message', messageHandler);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('message', messageHandler);
+    };
+  }, []);
+
   const createDeck = (payload) => {
     api
       .post("/decks/", payload)
@@ -129,16 +184,20 @@ const CreateSlides = () => {
   };
 
   const insertToDeck = (payload) => {
-    api
-      .post("/decks/slides_from_file_name/", payload)
-      .then((res) => {
-        console.log("Insert To Deck Response: ", res.data);
-        // setDeck(res.data);
-        createPowerPointSlides(res.data);
-      })
-      .catch((err) => {
-        console.log("Insert To Deck Error: ", err);
-      });
+    try {
+      // Get the dialog object using Office.context.ui
+      const messageObject = {
+        type: 'insertSlide',
+        // payload: payload
+      };
+
+      // Use Office Dialog API to send message to parent
+      Office.context.ui.messageParent(JSON.stringify(messageObject));
+      
+      console.log("Message sent to taskpane:", messageObject);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   return (

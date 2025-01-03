@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="./index.css" />
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    <script type="text/javascript">
+      Office.onReady((info) => {
+        if (info.host === Office.HostType.PowerPoint) {
+          console.log("Office.js is ready in dialog");
+        }
+      });
+    </script>
     <style>
       body {
         margin: 0;
