@@ -3,6 +3,19 @@ import React, { useState } from "react";
 const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
   const [userQuery, setUserQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {  // Check for Enter without Shift
+      e.preventDefault();  // Prevent default newline
+      if (step === "first" && userQuery.trim()) {
+        createDeck({
+          userQuery,
+          relevantProduct: "GreenTech Analytics",
+        });
+      }
+    }
+  };
+
   return (
     <div className="relative flex-1">
       <div className="text-sm font-bold text-[#666666] mb-2">Describe the presentation you would like</div>
@@ -18,6 +31,7 @@ const PresentationTextArea = ({ step, setStep, createDeck = (f) => f }) => {
               }`}
           value={userQuery}
           onChange={(e) => setUserQuery(e.target.value)}
+          onKeyPress={handleKeyPress}  // Add key press handler
         ></textarea>
         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between items-center">
           <span className="text-sm text-gray-500">{userQuery.length}/100000 characters</span>
