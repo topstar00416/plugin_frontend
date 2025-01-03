@@ -31,20 +31,17 @@ const CreateSlides = () => {
     }
   }, []);
 
-  const createDeck = (payload) => {
-    api
-      .post("/decks/", payload)
-      .then((res) => {
-        console.log("Create Deck Response: ", res.data);
-        setCreatedDeck(res.data);
-        setDeck(res.data.storylineSlides.sections);
-        setMainSection(res.data.storylineSlides.sections[0].sectionName);
-        setSubSection(res.data.storylineSlides.sections[0].subSections[0].subSectionName);
-        setStep("second");
-      })
-      .catch((err) => {
-        console.log("Create Deck Error: ", err);
-      });
+  const createDeck = async (payload) => {
+    try {
+      const { data } = await api.post("/decks/", payload);
+      setCreatedDeck(data);
+      setDeck(data.storylineSlides.sections);
+      setMainSection(data.storylineSlides.sections[0].sectionName);
+      setSubSection(data.storylineSlides.sections[0].subSections[0].subSectionName);
+      setStep("second");
+    } catch (error) {
+      console.error("Error creating deck:", error);
+    }
   };
 
   const insertToDeck = async (payload) => {
