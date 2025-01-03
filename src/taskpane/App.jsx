@@ -32,7 +32,7 @@ export default function App() {
             // console.log("Message received from dialog:", args.message);
 
             const { type, payload } = JSON.parse(args.message);
-            console.log("parsedMsg:", type, payload);
+            console.log("base64 payload:", payload);
 
             if (type === "insertSlide") {
               console.log("Inserting slide");
@@ -40,6 +40,7 @@ export default function App() {
                 try {
                   const presentation = context.presentation;
                   presentation.insertSlidesFromBase64(payload);
+                  await context.sync();
                 } catch (error) {
                   console.error("Error inserting slides:", error);
                 }

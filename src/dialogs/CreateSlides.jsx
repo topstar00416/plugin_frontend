@@ -167,13 +167,13 @@ const CreateSlides = () => {
                   <button
                     className="px-4 py-2 rounded-md bg-[#00BEC0] text-white hover:bg-[#00a5a7] transition-colors"
                     onClick={() => {
-                      insertToDeck({
-                        file_name: "mckinsey.pptx",
-                        slides: selectSlides.map((item) => ({
-                          slide_id: item.slideId,
-                          file_id: item.fileId,
-                        })),
-                      });
+                      insertToDeck(
+                        { file_name: "mckinsey.pptx" }
+                        // selectSlides.map((item) => ({
+                        //   slide_id: item.slideId,
+                        //   file_id: item.fileId,
+                        // }))
+                      );
                     }}
                   >
                     Insert to deck
