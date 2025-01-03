@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 const SlideCard = ({ slide, setSelectSlides, selectSlides, mainSection, subSection }) => {
   const tmp = selectSlides.some((item) => item.slideId === slide.slideId);
-  console.log("my_log_tmp", tmp);
+  // console.log("my_log_tmp", tmp);
   const [isChecked, setIsChecked] = React.useState(tmp);
 
   const handleCardClick = (state) => {

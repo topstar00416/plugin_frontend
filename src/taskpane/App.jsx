@@ -25,32 +25,23 @@ export default function App() {
         }
 
         const dialog = result.value;
-        
+
         // Handle messages from dialog
         dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (args) => {
           try {
-            console.log("Message received from dialog:", args.message);
+            // console.log("Message received from dialog:", args.message);
 
-            const parsedMsg = JSON.parse(args.message)
-            console.log(parsedMsg)
-            if (parsedMsg && parsedMsg.type === 'insertSlide') {
+            const { type, payload } = JSON.parse(args.message);
+            console.log("parsedMsg:", type, payload);
+            if (type === "insertSlide") {
               console.log("Inserting slide");
-              // Handle the slide insertion here in the taskpane
               await PowerPoint.run(async (context) => {
-                const presentation = context.presentation;
-                
-                // Get the current slides collection
-                const slides = presentation.slides;
-                slides.load("items");
-                await context.sync();
-                
-                // Add new slide at the end
-                const newSlide = slides.add({
-                  position: slides.items.length
-                });
-                
-                await context.sync();
-                console.log("Slide added successfully");
+                try {
+                  const presentation = context.presentation;
+                  presentation.insertSlidesFromBase64(payload);
+                } catch (error) {
+                  console.error("Error inserting slides:", error);
+                }
               });
             }
           } catch (error) {
